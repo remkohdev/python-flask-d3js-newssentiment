@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<title>My News Sentiment</title>
+<link href="{{ url_for('static', filename='stylesheets/style.css') }}"></link>
+</head>
+
+<body>
+  <h1>News Sentiment</h1>
+  <form action="" method="get" id="searchform">
+    <label for="startdate">Startdate:</label> 
+    <input type="date" name="startdate"> 
+    <label for="enddate">Enddate:</label> 
+    <input type="date" name="enddate"><br>
+    <label for="searchterm">Search for:</label>
+    <input type="text" name="searchterm"><br>
+    <label for="">Number of results</label>
+    <select name="count">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select><br>
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+  
+  <script type=text/javascript src="{{url_for('static', filename='js/jquery/jquery-3.1.1.min.js') }}"></script>
+  <script type=text/javascript src="{{url_for('static', filename='js/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+  <script type="text/javascript">
+  var validator = 
+    $('#searchform').validate({ 
+      rules: {
+        startdate: {
+          required: true
+        },
+        enddate: {
+          required: true
+        },
+        searchterm: {
+          required: true
+        }
+      },
+      submitHandler: function (form) {
+      	$('form#searchform').attr('action', '/search')
+        form.submit();
+      }
+    });
+  </script>
+  </body>
+</html>
