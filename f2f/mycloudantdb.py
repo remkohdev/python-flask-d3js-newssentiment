@@ -1,9 +1,10 @@
 from cloudant.client import Cloudant
 import json
 
-username = "<cloudant-username>"
-password = "<cloudant-password>"
-cloudantURL = "<cloudant-url>"
+
+username = ""
+password = ""
+cloudantURL = ""
 client = Cloudant(username, password, url=cloudantURL)
 
 def GetNews(): 

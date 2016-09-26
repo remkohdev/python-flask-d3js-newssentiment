@@ -27,77 +27,21 @@ def Welcome():
     
 @app.route('/search')
 def Search(startdate=None, enddate=None, searchterm=None, count=None):
-	startdateStr = request.args.get('startdate', '7daysago')
-	enddateStr = request.args.get('enddate', 'today')
+	startdateStr = request.args.get('startdate')
+	enddateStr = request.args.get('enddate')
 	searchterm = request.args.get('searchterm')
 	count = request.args.get('count')
 	
-	now = datetime.now()
-	startdate1 = datetime.strptime(startdateStr, '%Y-%m-%d')
-	enddate2 = datetime.strptime(enddateStr, '%Y-%m-%d')
-	deltastart = now-startdate1
-	deltaend = now-enddate2
-	startdate = ("now-{0}d").format(deltastart.days)
-	enddate = ("now-{0}d").format(deltaend.days)
+	# format the correct start and end formats
+	startdate = alchemyapi.FormatDate(startdateStr)
+	enddate = alchemyapi.FormatDate(enddateStr)
 
 	# GetNews with Sentiment
 	returnfields = 'enriched.url.url%2Cenriched.url.title%2Cenriched.url.publicationDate.date%2Cenriched.url.docSentiment.score'
 	articles = alchemyapi.GetNews(searchterm=searchterm, returnfields=returnfields, startdate=startdate, enddate=enddate, count=count)
-	articlesJson = json.loads(articles)
-
-	status1 = articlesJson['status']
-	if status1=='ERROR':
-		statusInfo = articlesJson['statusInfo']
-		errMsg = ('==Error in GetNews. StatusInfo: {0}').format(statusInfo)
-		print(errMsg)
-		# workaround for annoying alchemyapi rate limit
-		#return errMsg
-		articles = mycloudantdb.GetNews()
-		articlesJson = json.loads(articles)
-		print("=====News from Cloudant, continue")
-	elif status1=='OK':
-		print("=====News from GetNews")
-
-	docs = articlesJson['result']['docs']
-	sentimentList = []
-	for doc in docs:
-		enrichedURL = doc['source']['enriched']['url']
-		# Get publicationDate
-		publicationDate = enrichedURL['publicationDate']['date']
-		sentiment = ""
-		if status1=='OK':
-			sentiment = enrichedURL['docSentiment']['score']
-		elif status1=='ERROR':
-			sentiment = enrichedURL['enrichedTitle']['docSentiment']['score']
-		# construct data array for d3js, append row
-		sentimentRow = {"publicationDate": publicationDate, "sentiment": sentiment}
-		sentimentList.append(sentimentRow)
-
-	#get unique publicationDates
-	uniqueSentimentList=[]
-	uniqueDates = set()
-	for dic in sentimentList:
-		pubdate1 = dic['publicationDate']
-		pubdate1 = datetime.strptime(pubdate1, '%Y%m%dT%H%M%S')
-		if startdate1 < pubdate1:
-			uniqueDates.add(pubdate1)
-	uniqueDates = sorted(uniqueDates)
+	print("======articles: %s ", articles)
 	
-	# loop through the uniqueDates set and calculate averages per date
-	i1 = 0
-	for uniqueDate in uniqueDates:
-		i1 = i1 + 1
-		sentiments = 0
-		i = 0
-		for row in sentimentList:
-			rowDate = datetime.strptime(row['publicationDate'], '%Y%m%dT%H%M%S')
-			if rowDate==uniqueDate:
-				i = i + 1
-				sentiments += row['sentiment']
-		avgSentiment = sentiments/i
-		uniqueDateStr = datetime.strftime(uniqueDate, '%Y%m%dT%H%M%S')
-		uniqueSentimentRow = {"publicationDate": uniqueDateStr, "sentiment": avgSentiment}
-		uniqueSentimentList.append(uniqueSentimentRow)
+	uniqueSentimentList = alchemyapi.ParseNews(articles, startdateStr)
 
 	response = {
 		'news' : uniqueSentimentList,
@@ -108,6 +52,28 @@ def Search(startdate=None, enddate=None, searchterm=None, count=None):
 
 	return render_template('report.html',  
 		response=response)
+
+
+@app.route('/api/people')
+def GetPeople():
+    list = [
+        {'name': 'John', 'age': 28},
+        {'name': 'Bill', 'val': 26}
+    ]
+    return jsonify(results=list)
+
+@app.route('/api/people/<name>')
+def SayHello(name):
+    message = {
+        'message': 'Hello ' + name
+    }
+    return jsonify(results=message)
+
+port = os.getenv('PORT', '5000')
+if __name__ == "__main__":
+	app.run(host='0.0.0.0', port=int(port))
+
+
 
 	'''
 	For each News article, URLGetSentiment separately
@@ -132,22 +98,3 @@ def Search(startdate=None, enddate=None, searchterm=None, count=None):
 		sentimentCsv = alchemyapi.ParseSentimentToCsv(publicationDate, sentimentJson)
 		sentimentCsvList.append(sentimentCsv)
 	'''
-
-@app.route('/api/people')
-def GetPeople():
-    list = [
-        {'name': 'John', 'age': 28},
-        {'name': 'Bill', 'val': 26}
-    ]
-    return jsonify(results=list)
-
-@app.route('/api/people/<name>')
-def SayHello(name):
-    message = {
-        'message': 'Hello ' + name
-    }
-    return jsonify(results=message)
-
-port = os.getenv('PORT', '5000')
-if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=int(port))
