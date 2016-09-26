@@ -39,7 +39,6 @@ def Search(startdate=None, enddate=None, searchterm=None, count=None):
 	# GetNews with Sentiment
 	returnfields = 'enriched.url.url%2Cenriched.url.title%2Cenriched.url.publicationDate.date%2Cenriched.url.docSentiment.score'
 	articles = alchemyapi.GetNews(searchterm=searchterm, returnfields=returnfields, startdate=startdate, enddate=enddate, count=count)
-	print("======articles: %s ", articles)
 	
 	uniqueSentimentList = alchemyapi.ParseNews(articles, startdateStr)
 

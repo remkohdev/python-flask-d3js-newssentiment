@@ -9,8 +9,10 @@ apikey = ""
 def GetNews(searchterm=None, outputMode="json", startdate=None, enddate=None, count="5", returnfields="enriched.url.url"): 
 	conn = http.client.HTTPSConnection("gateway-a.watsonplatform.net")
 	headers = {
-    	'content-type': "application/json"
-	}
+    	'content-type': "application/json",
+    	'cache-control': "no-cache",
+    	'postman-token': "87821524-958d-4038-b35e-6e47449062c1"
+    }
 	endpoint = ('/calls/data/GetNews?outputMode={0}&start={1}&end={2}&count={3}&q.enriched.url.enrichedTitle.keywords.keyword.text={4}&return={5}&apikey={6}').format(outputMode, startdate, enddate, count, searchterm, returnfields, apikey)
 	print("==Calling GetNews endpoint: %s", endpoint)
 	conn.request("GET", endpoint, headers=headers)
@@ -37,6 +39,7 @@ def ParseNews(articles=None, startdate1=None):
 		status1 = 'ERROR'
 		articles = mycloudantdb.GetNews()
 		articlesJson = json.loads(articles)
+		#print(articlesJson)
 	else:
 		print("=====Articles: %s", articles)
 		articlesJson = json.loads(articles)
@@ -54,17 +57,24 @@ def ParseNews(articles=None, startdate1=None):
 		elif status1=='OK':
 			print("=====News from GetNews")
 
-	docs = articlesJson['result']['docs']
+	mycloudantdb.saveNews(articlesJson)
+	result = articlesJson['result']
+
+	docs = result['docs']
+	print('=====status: %s', status1)
 	sentimentList = []
 	for doc in docs:
-		enrichedURL = doc['source']['enriched']['url']
+		source = doc['source']
+		enriched = source['enriched']
+		enrichedURL = enriched['url']
 		# Get publicationDate
 		publicationDate = enrichedURL['publicationDate']['date']
 		sentiment = ""
 		if status1=='OK':
 			sentiment = enrichedURL['docSentiment']['score']
 		elif status1=='ERROR':
-			sentiment = enrichedURL['enrichedTitle']['docSentiment']['score']
+			#sentiment = enrichedURL['enrichedTitle']['docSentiment']['score']
+			sentiment = enrichedURL['docSentiment']['score']
 		# construct data array for d3js, append row
 		sentimentRow = {"publicationDate": publicationDate, "sentiment": sentiment}
 		sentimentList.append(sentimentRow)
@@ -108,3 +118,5 @@ def GetSentiment(outputMode="json", articleURL="https://developer.ibm.com/bluemi
 	res = conn.getresponse()
 	data = res.read()
 	return data.decode("utf-8")
+
+
