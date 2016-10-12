@@ -36,7 +36,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/remko/dev/src/bluemix/remkohdev-f2f-newssentiment/venv"
+set -gx VIRTUAL_ENV "/Users/remko/dev/src/github/python-flask-d3js-newssentiment/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

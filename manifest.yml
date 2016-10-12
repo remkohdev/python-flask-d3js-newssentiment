@@ -3,7 +3,7 @@ applications:
   memory: 128M
   instances: 1
   domain: mybluemix.net
-  name: remkohdev-f2f-newssentiment
-  host: remkohdev-f2f-newssentiment
+  name: remkohdev-newssentiment
+  host: remkohdev-newssentiment
   disk_quota: 1024M
   buildpack: python_buildpack

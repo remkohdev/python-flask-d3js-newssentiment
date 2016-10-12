@@ -2,31 +2,53 @@
 <html>
 <head>
 <title>My News Sentiment</title>
-<link href="{{ url_for('static', filename='stylesheets/style.css') }}"></link>
+<link href="{{ url_for('static', filename='stylesheets/style.css') }}">
+<style type="text/css">
+  body {
+    margin: 50px;
+  }
+  label {
+    display: inline-block; 
+    width: 200px;
+  }
+  button {
+    margin: 20px;
+  }
+</style>
+</link>
 </head>
 
 <body>
   <h1>News Sentiment</h1>
+   
   <form action="" method="get" id="searchform">
-    <label for="startdate">Startdate:</label> 
-    <input type="date" name="startdate"> 
-    <label for="enddate">Enddate:</label> 
-    <input type="date" name="enddate"><br>
-    <label for="searchterm">Search for:</label>
-    <input type="text" name="searchterm"><br>
-    <label for="">Number of results</label>
-    <select name="count">
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-    </select><br>
-    <br>
-    <button type="submit">Submit</button>
+    <div>
+      <label for="startdate">Startdate:</label> 
+      <input type="date" name="startdate">
+    </div>
+    <div>
+      <label for="enddate">Enddate:</label> 
+      <input type="date" name="enddate">
+    </div>
+    <div>
+      <label for="searchterm">Search for:</label>
+      <input type="text" name="searchterm">
+    </div>
+    <div>
+      <label for="">Number of results</label>
+      <select name="count">
+          <option value="25">25</option>
+          <option value="100">100</option>
+          <option value="500">500</option>
+          <option value="1000">1000</option>
+      </select>
+    </div>
+    <div><button type="submit">Submit</button> </div>
   </form>
+ 
   
   <script type=text/javascript src="{{url_for('static', filename='js/jquery/jquery-3.1.1.min.js') }}"></script>
-  <script type=text/javascript src="{{url_for('static', filename='js/jquery-validation/dist/jquery.validate.min.js') }}"></script>
+  <script type=text/javascript src="{{url_for('static', filename='js/jquery-validation/jquery-validation-1.15.1/dist/jquery.validate.min.js') }}"></script>
   <script type="text/javascript">
   var validator = 
     $('#searchform').validate({ 
