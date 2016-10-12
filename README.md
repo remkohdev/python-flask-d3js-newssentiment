@@ -11,3 +11,5 @@ To run execute the following commands:
     export FLASK_APP=welcome.py
     python3.5 -m flask run
 
+## Tutorial
+You can write the code from scratch by following the tutorial: [Creating Sentiment Line Chart for the News with Watson, Python, and D3js](http://www.remkohde.com/2016/09/25/creating-sentiment-line-chart-for-the-news-with-watson-python-and-d3js/).
