@@ -1,2 +1,2 @@
-launchConfigurations/
-.git/
+venv/
+__pycache__/
